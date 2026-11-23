@@ -1,0 +1,40 @@
+name: Zepp integration checks
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile integration
+        run: python -m compileall -q custom_components/zepp
+      - name: Validate integration manifest
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("custom_components/zepp/manifest.json").read_text())
+          required = {"domain", "name", "version", "documentation", "requirements", "config_flow"}
+          missing = required - manifest.keys()
+          assert not missing, f"Missing manifest keys: {sorted(missing)}"
+          assert manifest["domain"] == "zepp"
+          assert manifest["version"] == "1.0.3"
+          print(f"Validated {manifest['domain']} {manifest['version']}")
+          PY
