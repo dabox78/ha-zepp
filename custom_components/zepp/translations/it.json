@@ -1,0 +1,72 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Collega Zepp (Amazfit)",
+        "description": "### Scegli il metodo di accesso:\n\n**1. Email e password (account Zepp diretto)**\n* Scegli questa opzione se hai creato l'account Zepp con indirizzo email e password.\n* Accesso rapido in un solo passaggio. L'app Zepp sul telefono rimane connessa.\n* ⚠️ *Se nell'app usi Google, Apple o Mi per accedere, scegli il metodo 2.*\n\n**2. Cookie del browser / token web (Google, Apple, Mi o accessi social)**\n* Scegli questa opzione se il tuo account Zepp è collegato a Google, Apple ID, Mi Account o altri provider social.\n* Accedi al portale ufficiale Zepp dal browser, copia i cookie e incollali qui.\n* Le password Google e Apple non vengono comunicate a Home Assistant.",
+        "data": {
+          "auth_method": "Metodo di accesso"
+        }
+      },
+      "password": {
+        "title": "Accesso con email e password",
+        "description": "Inserisci le credenziali dirette del tuo account Zepp. La connessione usa una sessione web separata e non disconnette l'app sul telefono.",
+        "data": {
+          "email": "Indirizzo email",
+          "password": "Password",
+          "country_code": "Paese o regione dell'account"
+        }
+      },
+      "token": {
+        "title": "Accesso con cookie del browser (Google / Apple / Mi)",
+        "description": "### GUIDA PER ACCOUNT GOOGLE / APPLE / MI:\n\n1. Apri la pagina di accesso: [Accedi a Zepp]({login_url})\n2. Accedi con il tuo account Google, Apple o Mi.\n3. Dopo l'accesso potrebbe apparire la pagina Zepp Watchface Maker: è normale.\n4. Premi F12 (oppure clic destro → Ispeziona) e apri la scheda Console.\n   Se Chrome impedisce di incollare, digita `allow pasting` nella console e premi Invio.\n5. Copia il comando seguente, incollalo nella Console e premi Invio:\n`copy(document.cookie); console.log('COPIATO: INCOLLA IL TESTO IN HOME ASSISTANT'); console.log(document.cookie);`\n\n6. Torna qui e incolla il testo copiato nel campo sottostante.",
+        "data": {
+          "token_or_url": "Cookie del browser o token",
+          "country_code": "Paese o regione dell'account"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Riautorizza Zepp",
+        "description": "La sessione Zepp per l'account {account} è scaduta o richiede credenziali aggiornate.\nInserisci la password attuale oppure i nuovi cookie del browser.",
+        "data": {
+          "email": "Indirizzo email",
+          "password": "Password",
+          "token_or_url": "Cookie del browser o token",
+          "country_code": "Paese o regione dell'account"
+        }
+      },
+      "discovery": {
+        "title": "Connessione a Zepp"
+      },
+      "discovery_error": {
+        "title": "Connessione non riuscita",
+        "description": "Impossibile collegarsi ai server Zepp:\n\n**{error_detail}**\n\nPremi Invia per tornare indietro e verificare le credenziali."
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile collegarsi ai server Zepp",
+      "invalid_auth": "Credenziali non valide o token scaduto. Verifica i dati e riprova.",
+      "invalid_token": "Non sono state trovate credenziali valide nel testo inserito. Copia l'intero contenuto di document.cookie dal browser.",
+      "unknown": "Si è verificato un errore imprevisto"
+    },
+    "abort": {
+      "already_configured": "Questo account Zepp è già configurato.",
+      "reauth_successful": "Autorizzazione rinnovata correttamente.",
+      "unknown": "Errore imprevisto durante l'autenticazione."
+    },
+    "progress": {
+      "connecting": "Connessione ai server Zepp e ricerca degli smartwatch..."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configurazione integrazione Zepp",
+        "description": "Regola l'intervallo di aggiornamento in background dei dati di salute e attività.",
+        "data": {
+          "scan_interval": "Intervallo di aggiornamento"
+        }
+      }
+    }
+  }
+}
