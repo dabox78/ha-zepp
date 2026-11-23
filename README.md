@@ -326,3 +326,7 @@ Released under the **MIT License** — see [LICENSE](LICENSE) for details.
 ---
 
 Copyright (c) 2026 yardev
+
+## Fork maintenance
+
+This repository maintains the Home Assistant Zepp integration with sleep start/end timestamps and a one-time initial historical sync. See the [release notes](https://github.com/dabox78/ha-zepp/releases) for versioned changes.
