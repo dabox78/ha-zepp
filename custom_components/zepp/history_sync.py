@@ -65,6 +65,7 @@ async def async_sync_historical_data(
     chunk_size_days = 30
     cursor = start_date
     raw_days: dict[str, dict[str, Any]] = {}
+    sync_failed = False
     raw_hr_by_day: dict[str, bytes] = {}
     raw_activity_by_day: dict[str, bytes] = {}
 
@@ -102,9 +103,11 @@ async def async_sync_historical_data(
                         pass
         except ZeppAuthError:
             _LOGGER.warning("Zepp authentication expired during history sync. Aborting historical backfill.")
+            sync_failed = True
             break
         except Exception as err:
             _LOGGER.warning("Error fetching Zepp history chunk %s..%s: %s", from_str, to_str, err)
+            sync_failed = True
 
         cursor = chunk_end + datetime.timedelta(days=1)
         progress_val = min(75, int(5 + (len(raw_days) / max(1, days)) * 70))
@@ -168,8 +171,8 @@ async def async_sync_historical_data(
     if not raw_days:
         _LOGGER.info("No historical Zepp band data retrieved")
         hass.data[DOMAIN]["history_sync_status"] = {
-            "status": "completed",
-            "progress": 100,
+            "status": "failed",
+            "progress": 0,
             "synced_days": 0,
             "total_days": days,
             "heart_rate_points": 0,
@@ -436,8 +439,8 @@ async def async_sync_historical_data(
     )
 
     hass.data[DOMAIN]["history_sync_status"] = {
-        "status": "completed",
-        "progress": 100,
+        "status": "failed" if sync_failed else "completed",
+        "progress": 100 if not sync_failed else 0,
         "synced_days": len(raw_days),
         "total_days": days,
         "heart_rate_points": len(heart_rate_stats),
