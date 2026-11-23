@@ -144,6 +144,7 @@ async def async_sync_historical_data(
                 except (ValueError, TypeError):
                     pass
     except Exception as err:
+        sync_failed = True
         _LOGGER.warning("Error fetching Zepp stress history: %s", err)
 
     # 3. Fetch PAI Events
@@ -166,6 +167,7 @@ async def async_sync_historical_data(
                 except (ValueError, TypeError):
                     pass
     except Exception as err:
+        sync_failed = True
         _LOGGER.warning("Error fetching Zepp PAI history: %s", err)
 
     if not raw_days:
@@ -428,6 +430,7 @@ async def async_sync_historical_data(
         try:
             async_import_statistics(hass, meta, stats_list)
         except Exception as err:
+            sync_failed = True
             _LOGGER.warning("Failed importing statistics for %s: %s", stat_id, err)
 
     _LOGGER.info(
