@@ -250,6 +250,8 @@ class ZeppCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                                 result["sleep_end_time"] = None
                             if result["sleep_rhr"]:
                                 result["resting_hr"] = result["sleep_rhr"]
+                            # The first decoded sleep summary is the newest session.
+                            break
 
                 if band_items:
                     try:
