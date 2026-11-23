@@ -216,10 +216,8 @@ class ZeppCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                         except Exception as hr_err:
                             _LOGGER.debug("Error decoding data_hr: %s", hr_err)
 
-                # Sleep analysis: inspect most recent recorded sleep session (today or yesterday)
+                # Sleep analysis: always inspect the newest session returned by Zepp.
                 for item in reversed(band_items):
-                    if result.get("sleep_score") is not None:
-                        break
                     summary_raw = item.get("summary")
                     if summary_raw:
                         summary = decode_band_summary(summary_raw)
@@ -236,8 +234,24 @@ class ZeppCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                             result["wake_count"] = slp.get("wc")
                             result["sleep_duration"] = dp + lt + dt
                             result["sleep_rhr"] = slp.get("rhr")
+                            start_ts = slp.get("st")
+                            end_ts = slp.get("ed")
+                            try:
+                                result["sleep_start_time"] = (
+                                    datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc)
+                                    if isinstance(start_ts, (int, float)) and start_ts > 0 else None
+                                )
+                                result["sleep_end_time"] = (
+                                    datetime.datetime.fromtimestamp(end_ts, tz=datetime.timezone.utc)
+                                    if isinstance(end_ts, (int, float)) and end_ts > 0 else None
+                                )
+                            except (OverflowError, OSError, ValueError):
+                                result["sleep_start_time"] = None
+                                result["sleep_end_time"] = None
                             if result["sleep_rhr"]:
                                 result["resting_hr"] = result["sleep_rhr"]
+                            # The first decoded sleep summary is the newest session.
+                            break
 
                 if band_items:
                     try:

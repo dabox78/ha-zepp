@@ -1,6 +1,7 @@
 """Sensors for Zepp (Amazfit) integration."""
 from __future__ import annotations
 
+import datetime
 import logging
 from typing import Any
 
@@ -105,6 +106,8 @@ async def async_setup_entry(
         # 3. Sleep Sensors
         entities.extend([
             ZeppSleepScoreSensor(coordinator, device_id, device_name, device_info),
+            ZeppSleepStartTimeSensor(coordinator, device_id, device_name, device_info),
+            ZeppSleepEndTimeSensor(coordinator, device_id, device_name, device_info),
             ZeppSleepDurationSensor(coordinator, device_id, device_name, device_info),
             ZeppDeepSleepSensor(coordinator, device_id, device_name, device_info),
             ZeppLightSleepSensor(coordinator, device_id, device_name, device_info),
@@ -327,6 +330,43 @@ class ZeppSleepScoreSensor(CoordinatorEntity[ZeppCoordinator], SensorEntity):
     @property
     def native_value(self) -> int | None:
         return self.coordinator.data.get("sleep_score")
+
+
+
+class ZeppSleepStartTimeSensor(CoordinatorEntity[ZeppCoordinator], SensorEntity):
+    """Expose the actual sleep start timestamp reported by Zepp."""
+
+    _attr_has_entity_name = True
+    _attr_name = "Sleep Start Time"
+    _attr_icon = "mdi:bed-clock"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, coordinator: ZeppCoordinator, device_id: str, device_name: str, device_info: DeviceInfo) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{device_id}_sleep_start_time"
+        self._attr_device_info = device_info
+
+    @property
+    def native_value(self) -> datetime.datetime | None:
+        return self.coordinator.data.get("sleep_start_time")
+
+
+class ZeppSleepEndTimeSensor(CoordinatorEntity[ZeppCoordinator], SensorEntity):
+    """Expose the actual wake timestamp reported by Zepp."""
+
+    _attr_has_entity_name = True
+    _attr_name = "Sleep End Time"
+    _attr_icon = "mdi:alarm"
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, coordinator: ZeppCoordinator, device_id: str, device_name: str, device_info: DeviceInfo) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{device_id}_sleep_end_time"
+        self._attr_device_info = device_info
+
+    @property
+    def native_value(self) -> datetime.datetime | None:
+        return self.coordinator.data.get("sleep_end_time")
 
 
 class ZeppSleepDurationSensor(CoordinatorEntity[ZeppCoordinator], SensorEntity):
