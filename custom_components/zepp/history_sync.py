@@ -170,6 +170,48 @@ async def async_sync_historical_data(
         sync_failed = True
         _LOGGER.warning("Error fetching Zepp PAI history: %s", err)
 
+    # Extract exact sleep start/end timestamps from the daily summaries.
+    # Zepp stores slp.st and slp.ed as Unix seconds (not milliseconds).
+    sleep_sessions: list[dict[str, Any]] = []
+    seen_sleep_sessions: set[tuple[int, int]] = set()
+    for day_key, day_data in sorted(raw_days.items()):
+        slp = day_data.get("slp", {})
+        if not isinstance(slp, dict):
+            continue
+        try:
+            start_ts = int(float(slp.get("st")))
+            end_ts = int(float(slp.get("ed")))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if start_ts <= 0 or end_ts <= start_ts:
+            continue
+        # Reject implausible values and incomplete/future sessions.
+        if start_ts < 946684800 or end_ts > int(now.timestamp()) + 300:
+            continue
+        identity = (start_ts, end_ts)
+        if identity in seen_sleep_sessions:
+            continue
+        seen_sleep_sessions.add(identity)
+        start_dt = datetime.datetime.fromtimestamp(start_ts, tz=datetime.timezone.utc)
+        end_dt = datetime.datetime.fromtimestamp(end_ts, tz=datetime.timezone.utc)
+        if end_dt - start_dt > datetime.timedelta(hours=24):
+            continue
+        sleep_sessions.append({
+            "start": start_dt.isoformat(),
+            "end": end_dt.isoformat(),
+            "date": day_key,
+        })
+
+    if sleep_sessions:
+        _LOGGER.info("Found %d valid historical Zepp sleep sessions", len(sleep_sessions))
+        hass.bus.async_fire("zepp_sleep_history", {
+            "device_id": device_id_clean,
+            "sessions": sleep_sessions,
+            "days_requested": days,
+        })
+    else:
+        _LOGGER.info("No valid historical Zepp sleep start/end timestamps found")
+
     if not raw_days:
         _LOGGER.info("No historical Zepp band data retrieved")
         hass.data[DOMAIN]["history_sync_status"] = {
