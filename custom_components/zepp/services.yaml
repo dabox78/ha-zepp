@@ -1,14 +1,14 @@
 sync_history:
-  name: Синхронизировать историю
-  description: Загрузить исторические данные (шаги, калории, сон) из облака Zepp в долгосрочную статистику Home Assistant.
+  name: Sincronizza cronologia
+  description: Importa dallo spazio cloud Zepp i dati storici (passi, calorie e sonno) nel database storico di Home Assistant.
   fields:
     days:
-      name: Количество дней
-      description: За сколько дней в прошлом выгрузить историю (например, 30, 90, 365 или 1825 для 5 лет).
+      name: Giorni da sincronizzare
+      description: Numero di giorni passati da cui importare lo storico (ad esempio 30, 90, 365 oppure 1825 per 5 anni).
       default: 90
       selector:
         number:
           min: 1
           max: 7300
-          unit_of_measurement: дней
+          unit_of_measurement: giorni
           mode: box
