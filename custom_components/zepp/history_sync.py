@@ -171,8 +171,8 @@ async def async_sync_historical_data(
     if not raw_days:
         _LOGGER.info("No historical Zepp band data retrieved")
         hass.data[DOMAIN]["history_sync_status"] = {
-            "status": "failed",
-            "progress": 0,
+            "status": "failed" if sync_failed else "completed",
+            "progress": 0 if sync_failed else 100,
             "synced_days": 0,
             "total_days": days,
             "heart_rate_points": 0,
